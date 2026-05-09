@@ -237,49 +237,6 @@ Code should explain itself through clear naming and structure, but not every det
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js version 22.11.0 or higher
-- React Native development environment set up
-- Android Studio (for Android) or Xcode (for iOS)
-- All dependencies installed via npm or yarn
-
-### Installation & Running
-
-**Start the development server:**
-```
-npm start
-```
-or
-```
-yarn start
-```
-
-**Run on Android:**
-```
-npm run android
-```
-or
-```
-yarn android
-```
-
-**Run on iOS:**
-```
-npm run ios
-```
-or
-```
-yarn ios
-```
-
-### Development Scripts
-- `npm test` - Run unit tests
-- `npm run lint` - Check code quality with ESLint
-
----
-
 ## 📚 Technology Stack
 
 ### Frontend
@@ -343,18 +300,18 @@ These enhancements follow the same philosophy: they solve real user problems wit
 
 ---
 
-## 📝 Project Statistics
+## 📊 Project Statistics
 
 - **Total Lines of Code**: ~1,200 TypeScript/TSX
 - **Components**: 5 core components + 1 main app component
 - **Screens**: 2 main screens (Home, Add Expense)
 - **Database Tables**: 1 (expenses)
 - **Supported Platforms**: iOS 12+ and Android 8+
-- **Development Time**: Focused iteration with continuous refinement
+- **Development Focus**: User-centric design with pragmatic architecture
 
 ---
 
-## 🤝 Contributing & Support
+## 🤝 Contributing & Code Quality
 
 ### Code Quality Standards
 When contributing to this project, maintain:
@@ -362,19 +319,20 @@ When contributing to this project, maintain:
 - TypeScript types for all parameters and returns
 - Comments explaining "why", not "what"
 - Modular components that do one thing well
-- Consistent spacing and formatting
+- Consistent spacing and formatting (Prettier)
 
-### Bug Reports & Suggestions
-If you encounter issues:
-1. Verify all dependencies are correctly installed
-2. Clear Metro cache and rebuild: `npm start -- --reset-cache`
-3. Check that database has proper permissions on the device
+### Design Principles
+- Simplicity over complexity
+- User experience first
+- Privacy and data ownership
+- Graceful error handling
+- Offline-first capability
 
 ---
 
-## 📄 License & Attribution
+## 📄 Project License & Attribution
 
-This project demonstrates modern React Native development practices and mobile app architecture patterns.
+This project demonstrates modern React Native development practices and mobile app architecture patterns for real-world expense tracking.
 
 ---
 
