@@ -22,5 +22,5 @@ export const exportCSV = async (
   } catch (error) {
     console.log('CSV export error:', error);
     Alert.alert('Error', 'Failed to export CSV');
-}
+  }
 };
