@@ -5,8 +5,8 @@ import React, {
   useState,
 } from 'react';
 
-import { expenseReducer } from './expenseReducer';
-import { getExpenses } from '../db/database';
+import { expenseReducer } from './ExpenseReducer';
+import { getExpenses, insertExpense } from '../db/database';
 
 export const ExpenseContext = createContext<any>(null);
 
@@ -34,6 +34,18 @@ export const ExpenseProvider = ({ children }: any) => {
     }
   };
 
+  const addExpense = async (expense: any) => {
+    try {
+      await insertExpense(expense);
+      dispatch({
+        type: 'ADD_EXPENSE',
+        payload: expense,
+      });
+    } catch (error) {
+      console.log('Error adding expense:', error);
+    }
+  };
+
   useEffect(() => {
     loadExpenses();
   }, []);
@@ -45,6 +57,7 @@ export const ExpenseProvider = ({ children }: any) => {
         dispatch,
         loadExpenses,
         loading,
+        addExpense,
       }}
     >
       {children}
