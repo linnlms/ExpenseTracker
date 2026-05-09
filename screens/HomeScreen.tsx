@@ -1,15 +1,15 @@
-import React, {
-  useContext,
-  useState,
-} from 'react';
-
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  Dimensions,
+  Animated,
 } from 'react-native';
+
+import { PieChart, BarChart } from 'react-native-chart-kit';
 
 import { ExpenseContext } from '../context/ExpenseContext';
 import ExpenseItem from '../component/ExpenseItem';
@@ -19,37 +19,41 @@ import CategoryFilter from '../component/CategoryFilter';
 import { deleteExpense } from '../db/database';
 import { exportCSV } from '../utils/exportCSV';
 
-export default function HomeScreen({
-  navigation,
-}: any) {
-  const {
-    expenses,
-    dispatch,
-  } = useContext(ExpenseContext);
+const screenWidth = Dimensions.get('window').width;
+
+export default function HomeScreen({ navigation }: any) {
+  const { expenses, dispatch } = useContext(ExpenseContext);
 
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] =
-    useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+useEffect(() => {
+  Animated.timing(fadeAnim, {
+    toValue: 1,
+    duration: 500,
+    useNativeDriver: true,
+  }).start();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [search, selectedCategory, expenses]);
 
   const total = expenses.reduce(
-    (sum: number, item: any) =>
-      sum + Number(item.amount),
+    (sum: number, item: any) => sum + Number(item.amount),
     0,
   );
 
-  const filteredExpenses = expenses.filter(
-    (item: any) => {
-      const matchSearch = item.title
-        .toLowerCase()
-        .includes(search.toLowerCase());
+  const filteredExpenses = expenses.filter((item: any) => {
+    const matchSearch = item.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
-      const matchCategory =
-        selectedCategory === 'All' ||
-        item.category === selectedCategory;
+    const matchCategory =
+      selectedCategory === 'All' ||
+      item.category === selectedCategory;
 
-      return matchSearch && matchCategory;
-    },
-  );
+    return matchSearch && matchCategory;
+  });
 
   const handleDelete = async (id: string) => {
     await deleteExpense(id);
@@ -60,13 +64,37 @@ export default function HomeScreen({
     });
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.summaryCard}>
-        <Text style={styles.summaryLabel}>
-          Total Expenses
-        </Text>
+  const categoryMap: Record<string, number> = {};
 
+  filteredExpenses.forEach((item: any) => {
+    if (!categoryMap[item.category]) {
+      categoryMap[item.category] = 0;
+    }
+    categoryMap[item.category] += Number(item.amount);
+  });
+
+  const pieData = Object.keys(categoryMap).map((key, index) => ({
+    name: key,
+    amount: categoryMap[key],
+    color: getColor(index),
+    legendFontColor: '#333',
+    legendFontSize: 12,
+  }));
+
+  const barData = {
+    labels: Object.keys(categoryMap),
+    datasets: [
+      {
+        data: Object.values(categoryMap),
+      },
+    ],
+  };
+
+  return (
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryLabel}>Total Expenses</Text>
         <Text style={styles.summaryAmount}>
           RM {total.toFixed(2)}
         </Text>
@@ -74,10 +102,7 @@ export default function HomeScreen({
 
       <BudgetWarning total={total} />
 
-      <SearchBar
-        value={search}
-        onChange={setSearch}
-      />
+      <SearchBar value={search} onChange={setSearch} />
 
       <CategoryFilter
         selected={selectedCategory}
@@ -88,43 +113,71 @@ export default function HomeScreen({
         style={styles.exportBtn}
         onPress={() => exportCSV(expenses)}
       >
-        <Text style={styles.exportText}>
-          Export CSV
-        </Text>
+        <Text style={styles.exportText}>Export CSV</Text>
       </TouchableOpacity>
+
+      <Animated.View style={{ opacity: fadeAnim }}>
+        <Text style={styles.chartTitle}>Expense Breakdown</Text>
+
+        {pieData.length > 0 && (
+          <PieChart
+            data={pieData}
+            width={screenWidth - 40}
+            height={200}
+            accessor="amount"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+          />
+        )}
+
+        <Text style={styles.chartTitle}>Category Comparison</Text>
+
+        {barData.labels.length > 0 && (
+          <BarChart
+            data={barData}
+            width={screenWidth - 40}
+            height={220}
+            fromZero
+            showValuesOnTopOfBars
+            chartConfig={{
+              backgroundGradientFrom: '#fff',
+              backgroundGradientTo: '#fff',
+              color: () => '#4a90e2',
+            }}
+            style={styles.barStyle}
+          />
+        )}
+      </Animated.View>
 
       {filteredExpenses.length === 0 ? (
         <View style={styles.emptyBox}>
-          <Text style={styles.emptyText}>
-            No expenses found
-          </Text>
+          <Text>No expenses found</Text>
         </View>
       ) : (
         <FlatList
           data={filteredExpenses}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <ExpenseItem
-              item={item}
-              onDelete={handleDelete}
-            />
+            <ExpenseItem item={item} onDelete={handleDelete} />
           )}
-          showsVerticalScrollIndicator={false}
         />
       )}
 
       <TouchableOpacity
         style={styles.addBtn}
-        onPress={() =>
-          navigation.navigate('AddExpense')
-        }
+        onPress={() => navigation.navigate('AddExpense')}
       >
-        <Text style={styles.addText}>
-          + Add Expense
-        </Text>
+        <Text style={styles.addText}>+ Add Expense</Text>
       </TouchableOpacity>
-    </View>
+
+    </Animated.View>
   );
+}
+
+function getColor(index: number) {
+  const colors = ['#4a90e2', '#ff9800', '#28a745', '#e91e63', '#9c27b0'];
+  return colors[index % colors.length];
 }
 
 const styles = StyleSheet.create({
@@ -155,6 +208,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 14,
   },
+  barStyle: {
+    borderRadius: 12,
+  },
   exportText: {
     color: '#fff',
     fontWeight: '700',
@@ -162,9 +218,6 @@ const styles = StyleSheet.create({
   emptyBox: {
     marginTop: 80,
     alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 16,
   },
   addBtn: {
     backgroundColor: '#2E7D32',
@@ -177,5 +230,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
     fontSize: 16,
+  },
+  chartTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginVertical: 10,
   },
 });

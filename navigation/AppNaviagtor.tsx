@@ -1,12 +1,10 @@
 import React from 'react';
-import {
-  createNativeStackNavigator,
-} from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import HomeScreen from '../screens/HomeScreen';
-import AddExpenseScreen from '../screens/AddExpenseScreen';
+import AddExpenseScreen from '../screens/AddExpensesScreen';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 export default function AppNavigator() {
   return (
