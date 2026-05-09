@@ -262,12 +262,6 @@ Code should explain itself through clear naming and structure, but not every det
 - **json2csv** - Convert expense data to CSV format
 - **react-native-fs** - File system access for downloads
 
-### Development Tools
-- **Babel** - JavaScript transpilation
-- **Jest** - Testing framework
-- **ESLint** - Code quality analysis
-- **Prettier** - Automatic code formatting
-
 ---
 
 ## 🎯 Key Achievements
@@ -295,6 +289,8 @@ While the current version is fully functional, potential enhancements could incl
 - Budget customization per category
 - Expense notes for additional details
 - Receipt photo attachment capability
+- AI integration for analysis on expense
+- AI chatbox for supporting user
 
 These enhancements follow the same philosophy: they solve real user problems without adding unnecessary complexity.
 
